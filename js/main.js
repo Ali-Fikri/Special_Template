@@ -1,3 +1,29 @@
+///////////////////////////////
+//----------Elements---------//
+///////////////////////////////
+
+// Settings Box
+const colorLi = document.querySelectorAll(".colors-list li");
+const randomBackSpans = document.querySelectorAll(".background-options span");
+const bulletsOptSpan = document.querySelectorAll(".bullets-option span");
+// Navigation Bar
+const navBar = document.querySelector(".nav-bar");
+const bulletsNav = document.querySelector(".nav-bullets");
+const toggleMenuBtn = document.querySelector(".toggle-menu");
+const sections = document.querySelectorAll("section");
+// Landing Page
+const landingPage = document.querySelector(".landing-page");
+// Skills Section
+let skillsSec = document.querySelector(".skills");
+let skillItems = document.querySelectorAll(".skills .skill-progress span");
+// Timeline Section
+const boxes = document.querySelectorAll(".timeline-content .content-box");
+
+///////////////////////////////
+//-------Local Storage-------//
+///////////////////////////////
+
+//-----Color Option
 // Check If There's Local Storage Color Option
 let mainColor = localStorage.getItem("color_option");
 // If There's Color Item In Local Storage
@@ -5,7 +31,7 @@ if (mainColor !== null) {
   document.documentElement.style.setProperty("--main-color", mainColor);
 
   // Remove Active Class from All Colors List Item
-  document.querySelectorAll(".colors-list li").forEach((element) => {
+  colorLi.forEach((element) => {
     element.classList.remove("active");
 
     // Add Active Class If Element's Dataset Color === Local Storage Color Option
@@ -15,7 +41,7 @@ if (mainColor !== null) {
   });
 }
 
-// Random Background Option
+//-----Random Background Option
 let backgroundOption = true;
 
 // Variable to Control Background Interval
@@ -25,52 +51,43 @@ let backgroundInterval;
 let backgroundLocalItem = localStorage.getItem("background_option");
 // If There's Background Item In Local Storage
 if (backgroundLocalItem !== null) {
-  // Remove Active Class from All Background Items
-  document.querySelectorAll(".background-options span").forEach((element) => {
-    element.classList.remove("active");
-    if (backgroundLocalItem === "true") {
-      backgroundOption = true;
-
-      document
-        .querySelector(".background-options .yes")
-        .classList.add("active");
-    } else {
-      backgroundOption = false;
-
-      document.querySelector(".background-options .no").classList.add("active");
-    }
+  // Handel Background Options Classes
+  randomBackSpans.forEach((span) => {
+    handleRandomBackground(span);
   });
 }
 
+//-----Bullets Option
 // Check If There's Local Storage Bullets Option
 let bulletLocalItem = localStorage.getItem("bullets_option");
 // If There's Bullets Option Item In Local Storage
 if (bulletLocalItem !== null) {
   // Remove Active Class from All Bullets Option Items
-  document.querySelectorAll(".bullets-option span").forEach((element) => {
+  bulletsOptSpan.forEach((element) => {
     element.classList.remove("active");
     if (bulletLocalItem === "block") {
-      document.querySelector(".nav-bullets").style.display = `block`;
+      bulletsNav.style.display = `block`;
 
       document.querySelector(".bullets-option .yes").classList.add("active");
     } else {
-      document.querySelector(".nav-bullets").style.display = `none`;
+      bulletsNav.style.display = `none`;
 
       document.querySelector(".bullets-option .no").classList.add("active");
     }
   });
 }
 
-// Toggle Spin Class on Icon
-document.querySelector(".settings-icon").onclick = function () {
+////////////////////////////////
+//-------Event Listener-------//
+////////////////////////////////
+
+//-----Toggle Spin Class on Icon
+document.querySelector(".settings-icon").addEventListener("click", (icon) => {
   // Toggle Class fa-spin For Rotation on Self
-  this.classList.toggle("fa-spin");
+  icon.target.classList.toggle("fa-spin");
   // Toggle Class open on Main Settings Box
   document.querySelector(".settings-box").classList.toggle("open");
-};
-
-// Switch Colors
-const colorLi = document.querySelectorAll(".colors-list li");
+});
 
 // Loop On All List Items
 colorLi.forEach((li) => {
@@ -88,11 +105,8 @@ colorLi.forEach((li) => {
   });
 });
 
-// Switch Random Background Option
-const randomBackEl = document.querySelectorAll(".background-options span");
-
-// Loop On All Spans
-randomBackEl.forEach((span) => {
+//-----Random Background Options
+randomBackSpans.forEach((span) => {
   span.addEventListener("click", (e) => {
     handleState(e);
 
@@ -112,31 +126,7 @@ randomBackEl.forEach((span) => {
   });
 });
 
-const navBar = document.querySelector(".nav-bar");
-const sections = document.querySelectorAll("section");
-const bulletsNav = document.querySelector(".nav-bullets");
-
-// Build The Navbar and The Nav Bullets
-function createNavItem() {
-  const listFragment = document.createDocumentFragment();
-  const bulletFragment = document.createDocumentFragment();
-  for (const sec of sections) {
-    const listItem = document.createElement("li");
-    const bulletItem = document.createElement("div");
-    listItem.innerHTML = `<a href="#${sec.id}" class="link"</a>${sec.id}</a>`;
-    listFragment.appendChild(listItem);
-
-    bulletItem.innerHTML = `<div class="bullet" data-section=".${sec.id}"><div class="tooltip">${sec.id}</div></div>`;
-    bulletFragment.appendChild(bulletItem);
-  }
-  navBar.appendChild(listFragment);
-  bulletsNav.appendChild(bulletFragment);
-}
-createNavItem();
-
-// Select Bullets Option Spans
-const bulletsOptSpan = document.querySelectorAll(".bullets-option span");
-
+//-----Bullets Option
 bulletsOptSpan.forEach((span) => {
   span.addEventListener("click", (e) => {
     if (span.dataset.display === "show") {
@@ -152,70 +142,15 @@ bulletsOptSpan.forEach((span) => {
   });
 });
 
-// Select All Bullets
-const bullets = document.querySelectorAll(".nav-bullets .bullet");
-
-// Select All Nav Links
-const navLinks = document.querySelectorAll(".nav-bar .link");
-
-function scrollToSection(elements) {
-  elements.forEach((ele) => {
-    ele.addEventListener("click", (e) => {
-      e.preventDefault();
-
-      document.querySelector(e.target.dataset.section).scrollIntoView({
-        behavior: "smooth",
-      });
-    });
-  });
-}
-
-scrollToSection(bullets);
-scrollToSection(navLinks);
-
-// Get Landing Page Element
-let landingPage = document.querySelector(".landing-page");
-
-// Get Array of Images
-let imgsArray = [
-  "1-min.jpg",
-  "2-min.jpg",
-  "3-min.jpg",
-  "4-min.jpg",
-  "5-min.jpg",
-  "6-min.jpg",
-];
-
-let randomNumber;
-
-function randomizeImgs() {
-  if (backgroundOption === true) {
-    backgroundInterval = setInterval((_) => {
-      // Get Random Number
-      randomNumber = Math.floor(Math.random() * imgsArray.length);
-
-      // Change Background Image URL
-      landingPage.style.backgroundImage = `url(../imgs/${imgsArray[randomNumber]})`;
-    }, 10000);
-  }
-}
-
-randomizeImgs();
-
-// Reset Button
-document.querySelector(".reset-options").onclick = () => {
+//-----Reset Button
+document.querySelector(".reset-options").addEventListener("click", () => {
   localStorage.clear();
 
   window.location.reload();
-};
+});
 
-// Create Progress Bar For All Skills
-let skillsSec = document.querySelector(".skills");
-
-let skillItems = document.querySelectorAll(".skills .skill-progress span");
-
-window.onscroll = (_) => {
-  // console.log(window.scrollY);
+//-----Create Progress Bar For All Skills
+window.addEventListener("scroll", (_) => {
   if (window.scrollY >= skillsSec.offsetTop - 550) {
     skillItems.forEach((span) => {
       span.style.width = span.dataset.progress;
@@ -225,13 +160,11 @@ window.onscroll = (_) => {
       span.style.width = "0";
     });
   }
-};
+});
 
-// Create Popup with The Image
-let ourGallery = document.querySelectorAll(".images-box img");
-
-ourGallery.forEach((img) => {
-  img.addEventListener("click", (e) => {
+//-----Create Popup with The Image
+document.querySelectorAll(".images-box img").forEach((img) => {
+  img.addEventListener("click", () => {
     // Create Overlay Element
     let overlay = document.createElement("div");
 
@@ -276,10 +209,10 @@ ourGallery.forEach((img) => {
   });
 });
 
+//-----Close Popup Box and Overlay
 document.addEventListener("click", (e) => {
   if (e.target.className == "close-button") {
     // Remove Image Box
-
     document.querySelector(".popup-box").remove();
 
     // Remove Overlay
@@ -287,9 +220,7 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Create Scroll Animation to Timeline Section
-const boxes = document.querySelectorAll(".timeline-content .content-box");
-
+//-----Create Scroll Animation to Timeline Section
 window.addEventListener("scroll", (_) => {
   const triggerBottom = window.innerHeight;
 
@@ -304,21 +235,8 @@ window.addEventListener("scroll", (_) => {
   });
 });
 
-// Handle The State
-function handleState(ev) {
-  // Remove Active Class from All Colors List Item
-  ev.target.parentElement.querySelectorAll(".active").forEach((element) => {
-    element.classList.remove("active");
-  });
-  // Add Active Class on Element
-  ev.target.classList.add("active");
-}
-
-// Toggle Menu
-let toggleBtn = document.querySelector(".toggle-menu");
-let tNav = document.querySelector(".nav-bar");
-
-toggleBtn.onclick = function (btn) {
+//-----Toggle Menu
+toggleMenuBtn.addEventListener("click", (btn) => {
   // Stop Propagation
   btn.stopPropagation();
 
@@ -326,24 +244,108 @@ toggleBtn.onclick = function (btn) {
   this.classList.toggle("active");
 
   // Toggle Class 'open' on Nav Menu
-  tNav.classList.toggle("open");
-};
+  navBar.classList.toggle("open");
+});
 
 // Stop Propagation on Nav Menu
-tNav.onclick = function (nav) {
+navBar.onclick = function (nav) {
   nav.stopPropagation();
 };
 
-// Click Anywhere Outside Nav Menu and Button
+//-----Click Anywhere Outside Nav Menu and Button
 document.addEventListener("click", (e) => {
-  if (e.target !== toggleBtn && e.target !== tNav) {
+  if (e.target !== toggleMenuBtn && e.target !== navBar) {
     // If Menu is Open
-    if (tNav.classList.contains("open")) {
+    if (navBar.classList.contains("open")) {
       // Toggle Class 'active' on Button
-      toggleBtn.classList.toggle("active");
+      toggleMenuBtn.classList.toggle("active");
 
       // Toggle Class 'open' on Nav Menu
-      tNav.classList.toggle("open");
+      navBar.classList.toggle("open");
     }
   }
 });
+
+///////////////////////////////
+//---------Functions---------//
+///////////////////////////////
+//----- Build The Navbar and The Nav Bullets
+const createNavItem = (_) => {
+  sections.forEach((sec) => {
+    const listItem = document.createElement("li");
+    const bulletItem = document.createElement("div");
+
+    listItem.innerHTML = `<a href="#${sec.id}"
+    data-section=".${sec.id}" class="link"</a>${sec.id}</a>`;
+    navBar.appendChild(listItem);
+
+    bulletItem.innerHTML = `<div class="bullet" data-section=".${sec.id}"><div class="tooltip">${sec.id}</div></div>`;
+    bulletsNav.appendChild(bulletItem);
+  });
+};
+createNavItem();
+
+//-----Smooth Scrolling To The Section
+const scrollToSection = (elements) => {
+  elements.forEach((ele) => {
+    ele.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      document.querySelector(e.target.dataset.section).scrollIntoView({
+        behavior: "smooth",
+      });
+    });
+  });
+};
+scrollToSection(document.querySelectorAll(".nav-bullets .bullet"));
+scrollToSection(document.querySelectorAll(".nav-bar .link"));
+
+//-----Handle The State
+const handleState = (element) => {
+  // Remove Active Class from All Colors List Item
+  element.target.parentElement.querySelectorAll(".active").forEach((e) => {
+    e.classList.remove("active");
+  });
+  // Add Active Class on Element
+  element.target.classList.add("active");
+};
+
+//-----Handel Active Background's Option span
+const handleRandomBackground = (backgroundElement) => {
+  // Remove Active Class from All Background Items
+  backgroundElement.classList.remove("active");
+  if (backgroundLocalItem === "true") {
+    backgroundOption = true;
+
+    document.querySelector(".background-options .yes").classList.add("active");
+  } else {
+    backgroundOption = false;
+
+    document.querySelector(".background-options .no").classList.add("active");
+  }
+};
+
+//-----Randomize Images
+const randomizeImgs = (_) => {
+  // Get Array of Images
+  let imgsArray = [
+    "1-min.jpg",
+    "2-min.jpg",
+    "3-min.jpg",
+    "4-min.jpg",
+    "5-min.jpg",
+    "6-min.jpg",
+  ];
+  let randomNumber;
+  if (backgroundOption === true) {
+    backgroundInterval = setInterval((_) => {
+      // Get Random Number
+      randomNumber = Math.floor(Math.random() * imgsArray.length);
+
+      // Change Background Image URL
+      landingPage.style.backgroundImage = `url(../imgs/${imgsArray[randomNumber]})`;
+    }, 10000);
+  }
+};
+
+randomizeImgs();
